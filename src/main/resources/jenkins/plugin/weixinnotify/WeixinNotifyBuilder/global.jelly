@@ -1,12 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:section title="微信通知">
-    <f:entry title="API服务器地址" field="server" value="qyapi.weixin.qq.com" >
-	    <f:textbox />
-	  </f:entry>
-	  <f:entry title="API服务器端口" field="serverPort" value="443">
-	    <f:textbox />
-	  </f:entry>
 	  <f:entry title="企业CorpID" field="corpId">
       	    <f:textbox />
       	  </f:entry>
@@ -17,7 +11,7 @@
 	    <f:textbox />
 	  </f:entry>
 	  <f:advanced>
-	  	<f:entry title="微信消息模板Id" field="templateId">
+	  	<f:entry title="微信消息模板" field="template">
 	    	<f:textbox />
 	  	</f:entry>
 	  </f:advanced>

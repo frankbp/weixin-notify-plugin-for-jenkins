@@ -4,5 +4,5 @@
 -->
 <?jelly escape-by-default='true'?>
 <div>
-	The plugin supports the sending of the results to the user's micro-mail terminal in order to keep abreast of the build results.
+	微信通知
 </div>

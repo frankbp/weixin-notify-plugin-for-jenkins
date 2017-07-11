@@ -17,9 +17,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.IOException;
 
 /**
- * Created by Marvin on 16/8/25.
+ * Created by jianjing on 2017/7/11.
  */
-public class WeixinNotifyBuilder extends Notifier {
+public class WeixinNotify extends Notifier {
 
 	private String accessToken;
 
@@ -28,8 +28,6 @@ public class WeixinNotifyBuilder extends Notifier {
 	private boolean onSuccess;
 
 	private boolean onFailed;
-
-	private String jenkinsURL;
 
 
 	public boolean isOnStart() {
@@ -49,16 +47,16 @@ public class WeixinNotifyBuilder extends Notifier {
 	}
 
 	@DataBoundConstructor
-	public WeixinNotifyBuilder(String accessToken, boolean onStart, boolean onSuccess, boolean onFailed, String jenkinsURL) {
+	public WeixinNotify(String accessToken, boolean onStart, boolean onSuccess, boolean onFailed, String jenkinsURL) {
 		super();
 		this.accessToken = accessToken;
-		this.onStart = onStart;
-		this.onSuccess = onSuccess;
-		this.onFailed = onFailed;
+		this.onStart = true;
+		this.onSuccess = true;
+		this.onFailed = true;
 	}
 
-	public WeixinService newDingdingService(AbstractBuild build, TaskListener listener) {
-		return new WeixinServiceImpl(jenkinsURL, accessToken, onStart, onSuccess, onFailed, listener, build);
+	public WeixinService newWeixinService(AbstractBuild build, TaskListener listener) {
+		return new WeixinServiceImpl(accessToken, onStart, onSuccess, onFailed, listener, build);
 	}
 
 	@Override
