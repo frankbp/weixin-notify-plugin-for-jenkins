@@ -1,6 +1,8 @@
 package jenkins.plugin.weixinnotify;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
@@ -9,7 +11,8 @@ import com.alibaba.fastjson.TypeReference;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 
-import jenkins.model.Jenkins;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -19,21 +22,21 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * Created by jianjing on 2017/7/11.
  */
 public class WeixinServiceImpl implements WeixinService {
-    private Logger logger = LoggerFactory.getLogger(WeixinService.class);
 
-    private BuildListener listener;
     private AbstractBuild build;
     private String corpId;
     private String corpSecret;
     private String agentId;
+    private String toUser;
+
+    private Run run;
+
+    private PrintStream logger;
 
     private static final String apiUrl = "https://qyapi.weixin.qq.com/cgi-bin";
 
@@ -45,15 +48,22 @@ public class WeixinServiceImpl implements WeixinService {
         agentId = new WeixinNotify().getDescriptor().getAgentId();
     }
 
-    public WeixinServiceImpl(BuildListener listener, AbstractBuild build) {
-        this.listener = listener;
+    public WeixinServiceImpl(BuildListener listener, AbstractBuild build, String toUser) {
+        this.logger = listener.getLogger();
         this.build = build;
+        this.toUser = toUser;
+    }
+
+    public WeixinServiceImpl(TaskListener listener, Run run, String toUser) {
+        this.logger = listener.getLogger();
+        this.run = run;
+        this.toUser = toUser;
     }
 
     public void sendContent(String msgType, String content) {
-        this.listener.getLogger().println("sendContent");
+        this.logger.println("sendContent");
         if (!sendMessageWithToken(content)) {
-            requestForToken(this.corpId, this.corpSecret);
+            requestForToken();
             sendMessageWithToken(content);
         }
     }
@@ -85,21 +95,61 @@ public class WeixinServiceImpl implements WeixinService {
 
     @Override
     public void sendTextcard() {
-        this.listener.getLogger().println("sendTextcard");
+        this.logger.println("sendTextcard");
+        this.logger.println(toUser.toString());
+        if (toUser instanceof String) {
+            toUser = (String)toUser;
+        }
+
+//        if (toUserObject instanceof ArrayList) {
+//            StringBuilder temp = new StringBuilder();
+//            for (Object object : (ArrayList)toUserObject) {
+//                if (object instanceof ArrayList) {
+//                    temp.append(String.join("|", (ArrayList)object));
+//                }
+//            }
+//            toUser = temp.toString();
+//        }
+        this.logger.println(toUser);
         String content = String.format(WeixinMessageTemplate.SEND_TEXTCARD_TEMPLATE,
-                "jianjing",
+                toUser,
                 this.agentId,
                 WeixinMessageTemplate.TITLE,
-                "项目名称: " + this.build.getProject().getDisplayName() +
-                        "\n构建开始时间: " + this.build.getTimestamp().getTime().toString() +
-                        "\n构建持续时间: " + this.build.getDurationString() +
-                        "\n构建结果: " + this.build.getResult().toString(),
-                this.build.getProject().getAbsoluteUrl() + this.build.getId());
+                generateDescription(),
+                generateUrl());
         sendContent("textcard", content);
     }
 
-    private String requestForToken(String corpId, String corpSecret) {
-        String url = String.format("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s", this.corpId, this.corpSecret);
+    private String generateDescription() {
+        if (this.build != null) {
+            return String.format(WeixinMessageTemplate.DESCRIPTION,
+                    this.build.getProject().getDisplayName(),
+                    this.build.getTimestamp().getTime().toString(),
+                    this.build.getDurationString(),
+                    this.build.getResult().toString());
+        }
+        if (this.run != null) {
+            return String.format(WeixinMessageTemplate.DESCRIPTION,
+                    this.run.getParent().getDisplayName(),
+                    this.run.getTimestamp().getTime().toString(),
+                    this.run.getDurationString(),
+                    this.run.getResult().toString());
+        }
+        return "";
+    }
+
+    private String generateUrl() {
+        if (this.build != null) {
+            return this.build.getProject().getAbsoluteUrl() + this.build.getId();
+        }
+        if (this.run != null) {
+            return this.run.getAbsoluteUrl() + this.run.getId();
+        }
+        return "";
+    }
+
+    private String requestForToken() {
+        String url = String.format(WeixinApi.URL_ACCESS_TOKEN, this.corpId, this.corpSecret);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
@@ -108,32 +158,32 @@ public class WeixinServiceImpl implements WeixinService {
             try {
                 HttpEntity entity = response.getEntity();
                 String responseString = EntityUtils.toString(entity);
-                listener.getLogger().println(responseString);
+                logger.println(responseString);
                 Map<String, String> responseMap = JSON.parseObject(responseString, new TypeReference<Map<String, String>>(){});
-                listener.getLogger().println(responseMap);
+                logger.println(responseMap);
                 token = responseMap.get("access_token").toString(); //缓存token
                 return token;
 
             } catch (Exception e) {
-                listener.getLogger().println(e.toString());
+                logger.println(e.toString());
             } finally {
                 response.close();
             }
         } catch (IOException e) {
-            listener.getLogger().println(e.toString());
+            logger.println(e.toString());
         }
         return null;
     }
 
     private boolean sendMessageWithToken(String content) {
-        listener.getLogger().println("sendMessageWithToken");
+        logger.println("sendMessageWithToken");
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost(WeixinApi.URL_SEND_MESSAGE + token);
+        HttpPost httppost = new HttpPost(String.format(WeixinApi.URL_SEND_MESSAGE, token));
 
         try {
                 StringEntity params = new StringEntity(content, "UTF-8");
-            listener.getLogger().println(content);
+            logger.println(content);
                 httppost.setEntity(params);
                 httppost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
                 CloseableHttpResponse response = httpClient.execute(httppost);
@@ -141,30 +191,30 @@ public class WeixinServiceImpl implements WeixinService {
                     HttpEntity entity = response.getEntity();
                     String responseString = EntityUtils.toString(entity);
                     Map<String, String> responseMap = JSON.parseObject(responseString, new TypeReference<Map<String, String>>() {});
-                    listener.getLogger().println(responseMap);
+                    logger.println(responseMap);
                     String errcode = responseMap.get("errcode").toString();
-                    listener.getLogger().println(errcode);
+                    logger.println(errcode);
                     if (!errcode.equals("0")) {
                         String errmsg = responseMap.get("errmsg").toString();
-                        listener.getLogger().println(errmsg);
+                        logger.println(errmsg);
                         if (errmsg.equals("invalid access_token")) {
                             return false;
                         }
-                        listener.getLogger().println(String.format("发送消息失败, errcode=%s, errmsg=%s", errcode, errmsg));
+                        logger.println(String.format("发送消息失败, errcode=%s, errmsg=%s", errcode, errmsg));
                     }
 
                 } catch (IOException e) {
-                    listener.getLogger().println(String.format("发送消息失败, exception=%s", e.toString()));
+                    logger.println(String.format("发送消息失败, exception=%s", e.toString()));
                 } finally {
                     response.close();
                 }
             } catch (IOException e) {
-                listener.getLogger().println(String.format("发送消息失败, exception=%s", e.toString()));
+                logger.println(String.format("发送消息失败, exception=%s", e.toString()));
             } finally {
             try {
                 httpClient.close();
             } catch (IOException e) {
-                listener.getLogger().println("httpClient关闭失败");
+                logger.println("httpClient关闭失败");
             }
         }
             return true;

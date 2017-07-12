@@ -71,8 +71,5 @@ public class WeixinMessageTemplate {
 
     protected static final String TITLE = "构建结果";
 
-    protected static final String DESCRIPTION = "<div class=\"gray\">" +
-            "<table>" +
-            "<tr><td>";
-            //</div> <div class=\"normal\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\\\"highlight\\\">请于2016年10月10日前联系行政同事领取</div>";
+    protected static final String DESCRIPTION = "项目名称: %s\n构建开始时间: %s\n构建持续时间: %s\n构建结果: %s";
 }

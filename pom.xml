@@ -15,8 +15,8 @@
 
 	<properties>
 		<jenkins.version>2.60.1</jenkins.version>
-		<java.level>7</java.level>
-		<java.version>1.7</java.version>
+		<java.level>8</java.level>
+		<java.version>1.8</java.version>
 		<jenkins-test-harness.version>2.13</jenkins-test-harness.version>
 	</properties>
 
