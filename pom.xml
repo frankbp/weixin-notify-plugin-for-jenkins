@@ -9,7 +9,7 @@
 		<version>2.11</version>
 	</parent>
 	<groupId>jenkins.plugin</groupId>
-	<artifactId>weixinnotify</artifactId>
+	<artifactId>weixin-notification</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 
@@ -20,7 +20,7 @@
 		<jenkins-test-harness.version>2.13</jenkins-test-harness.version>
 	</properties>
 
-	<name>Jenkins Weixin Notify</name>
+	<name>Jenkins Weixin Notification</name>
 	<description>Send Wechat message at post build stage</description>
 	<url>https://github.com/frankbp/weixin-notify-plugin-for-jenkins</url>
 

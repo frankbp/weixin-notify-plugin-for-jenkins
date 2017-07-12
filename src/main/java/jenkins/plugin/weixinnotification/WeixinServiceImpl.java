@@ -1,8 +1,8 @@
-package jenkins.plugin.weixinnotify;
+package jenkins.plugin.weixinnotification;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
@@ -13,6 +13,7 @@ import hudson.model.BuildListener;
 
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import jenkins.model.Jenkins;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -38,14 +39,18 @@ public class WeixinServiceImpl implements WeixinService {
 
     private PrintStream logger;
 
-    private static final String apiUrl = "https://qyapi.weixin.qq.com/cgi-bin";
-
     private static String token;
+    private static Map<String, String> BUILD_RESULT_MAP = new HashMap<>();
+
 
     {
-        corpId = new WeixinNotify().getDescriptor().getCorpId();
-        corpSecret = new WeixinNotify().getDescriptor().getCorpSecret();
-        agentId = new WeixinNotify().getDescriptor().getAgentId();
+        corpId = new WeixinNotification().getDescriptor().getCorpId();
+        corpSecret = new WeixinNotification().getDescriptor().getCorpSecret();
+        agentId = new WeixinNotification().getDescriptor().getAgentId();
+
+        BUILD_RESULT_MAP.put("SUCCESS", "成功");
+        BUILD_RESULT_MAP.put("FAIL", "失败");
+        BUILD_RESULT_MAP.put("UNSTABLE", "不稳定");
     }
 
     public WeixinServiceImpl(BuildListener listener, AbstractBuild build, String toUser) {
@@ -60,7 +65,7 @@ public class WeixinServiceImpl implements WeixinService {
         this.toUser = toUser;
     }
 
-    public void sendContent(String msgType, String content) {
+    public void sendContent(String content) {
         this.logger.println("sendContent");
         if (!sendMessageWithToken(content)) {
             requestForToken();
@@ -70,55 +75,74 @@ public class WeixinServiceImpl implements WeixinService {
 
     @Override
     public void sendText(String text) {
-        sendContent("text", text);
+        String content = String.format(WeixinApi.TEMPLATE_SEND_TEXT,
+                toUser,
+                this.agentId,
+                text);
+        sendContent(content);
     }
 
     @Override
     public void sendImage(String imageId) {
-        sendContent("image", imageId);
+        String content = String.format(WeixinApi.TEMPLATE_SEND_IMAGE,
+                toUser,
+                this.agentId,
+                imageId);
+        sendContent(content);
     }
 
     @Override
     public void sendVoice(String voiceId) {
-        sendContent("voice", voiceId);
+        String content = String.format(WeixinApi.TEMPLATE_SEND_IMAGE,
+                toUser,
+                this.agentId,
+                voiceId);
+        sendContent(content);
     }
 
     @Override
     public void sendVideo(String videoId) {
-        sendContent("video", videoId);
+        String content = String.format(WeixinApi.TEMPLATE_SEND_IMAGE,
+                toUser,
+                this.agentId,
+                videoId);
+        sendContent(content);
     }
 
     @Override
     public void sendFile(String fileId) {
-        sendContent("file", fileId);
+        String content = String.format(WeixinApi.TEMPLATE_SEND_IMAGE,
+                toUser,
+                this.agentId,
+                fileId);
+        sendContent(content);
     }
 
     @Override
     public void sendTextcard() {
-        this.logger.println("sendTextcard");
-        this.logger.println(toUser.toString());
-        if (toUser instanceof String) {
-            toUser = (String)toUser;
-        }
-
-//        if (toUserObject instanceof ArrayList) {
-//            StringBuilder temp = new StringBuilder();
-//            for (Object object : (ArrayList)toUserObject) {
-//                if (object instanceof ArrayList) {
-//                    temp.append(String.join("|", (ArrayList)object));
-//                }
-//            }
-//            toUser = temp.toString();
-//        }
-        this.logger.println(toUser);
-        String content = String.format(WeixinMessageTemplate.SEND_TEXTCARD_TEMPLATE,
+        String content = String.format(WeixinApi.TEMPLATE_SEND_TEXTCARD,
                 toUser,
                 this.agentId,
-                WeixinMessageTemplate.TITLE,
+                String.format(WeixinMessageTemplate.TITLE,
+                        getBuildResult()),
                 generateDescription(),
                 generateUrl());
-        sendContent("textcard", content);
+        sendContent(content);
     }
+
+    @Override
+    public void sendNews() {
+        String content = String.format(WeixinApi.TEMPLATE_SEND_NEWS,
+                toUser,
+                this.agentId,
+                String.format(WeixinMessageTemplate.TITLE,
+                        getBuildResult()),
+                generateDescription(),
+                generateUrl(),
+                generateIcon());
+        sendContent(content);
+    }
+
 
     private String generateDescription() {
         if (this.build != null) {
@@ -126,16 +150,30 @@ public class WeixinServiceImpl implements WeixinService {
                     this.build.getProject().getDisplayName(),
                     this.build.getTimestamp().getTime().toString(),
                     this.build.getDurationString(),
-                    this.build.getResult().toString());
+                    getBuildResult());
         }
         if (this.run != null) {
             return String.format(WeixinMessageTemplate.DESCRIPTION,
                     this.run.getParent().getDisplayName(),
                     this.run.getTimestamp().getTime().toString(),
                     this.run.getDurationString(),
-                    this.run.getResult().toString());
+                    getBuildResult());
         }
         return "";
+    }
+
+    private String getBuildResult() {
+        String buildResult = "";
+
+        if (this.build != null) {
+            buildResult = this.build.getResult().toString();
+
+        }
+        if (this.run != null) {
+            buildResult = this.run.getResult().toString();
+        }
+
+        return BUILD_RESULT_MAP.getOrDefault(buildResult, "未知");
     }
 
     private String generateUrl() {
@@ -146,6 +184,43 @@ public class WeixinServiceImpl implements WeixinService {
             return this.run.getAbsoluteUrl() + this.run.getId();
         }
         return "";
+    }
+
+    private String getJenkinUrl() {
+        return Jenkins.getInstance().getRootUrl();
+    }
+
+    private String getSuccessIcon() {
+        return "http://www.iconsdb.com/icons/download/green/circle-48.png";
+        //return getJenkinUrl() + "static/e59dfe28/images/48x48/blue.png";
+    }
+
+    private String getFailIcon() {
+        return "http://www.iconsdb.com/icons/download/red/circle-48.png";
+        //return getJenkinUrl() + "static/e59dfe28/images/48x48/red.png";
+    }
+
+    private String getUnstableIcon() {
+        return "http://www.iconsdb.com/icons/download/yellow/circle-48.png";
+        //return getJenkinUrl() + "static/e59dfe28/images/48x48/yellow.png";
+    }
+
+    private String getUnknownIcon() {
+        return "http://www.iconsdb.com/icons/download/icon-sets/gray-leather/circle-48.png";
+        //return getJenkinUrl() + "static/e59dfe28/images/48x48/grey.png";
+    }
+
+    private String generateIcon() {
+        if (getBuildResult().equals("成功")) {
+            return getSuccessIcon();
+        }
+        if (getBuildResult().equals("失败")) {
+            return getFailIcon();
+        }
+        if (getBuildResult().equals("不稳定")) {
+            return getUnstableIcon();
+        }
+        return getUnknownIcon();
     }
 
     private String requestForToken() {

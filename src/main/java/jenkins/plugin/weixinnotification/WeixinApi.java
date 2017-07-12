@@ -1,11 +1,14 @@
-package jenkins.plugin.weixinnotify;
+package jenkins.plugin.weixinnotification;
 
 /**
  * Created by jianjing on 2017/7/12.
  */
-public class WeixinMessageTemplate {
+public class WeixinApi {
+    protected static final String URL_SEND_MESSAGE = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=%s";
 
-    protected static final String SEND_TEXT_TEMPLATE = String.format("{\n" +
+    protected static final String URL_ACCESS_TOKEN = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s";
+
+    protected static final String TEMPLATE_SEND_TEXT = "{\n" +
             "   \"touser\" : \"%s\",\n" +
             "   \"msgtype\" : \"text\",\n" +
             "   \"agentid\" : %s,\n" +
@@ -13,9 +16,9 @@ public class WeixinMessageTemplate {
             "       \"content\" : \"%s\"\n" +
             "   },\n" +
             "   \"safe\":0\n" +
-            "}");
+            "}";
 
-    protected static final String SEND_IMAGE_TEMPLATE = String.format("{\n" +
+    protected static final String TEMPLATE_SEND_IMAGE = "{\n" +
             "   \"touser\" : \"%s\",\n" +
             "   \"msgtype\" : \"image\",\n" +
             "   \"agentid\" : %s,\n" +
@@ -23,9 +26,9 @@ public class WeixinMessageTemplate {
             "       \"media_id\" : \"%s\"\n" +
             "   },\n" +
             "   \"safe\":0\n" +
-            "}");
+            "}";
 
-    protected static final String SEND_VOICE_TEMPLATE = String.format("{\n" +
+    protected static final String TEMPLATE_SEND_VOICE = "{\n" +
             "   \"touser\" : \"%s\",\n" +
             "   \"msgtype\" : \"voice\",\n" +
             "   \"agentid\" : %s,\n" +
@@ -33,9 +36,9 @@ public class WeixinMessageTemplate {
             "       \"media_id\" : \"%s\"\n" +
             "   },\n" +
             "   \"safe\":0\n" +
-            "}");
+            "}";
 
-    protected static final String SEND_FILE_TEMPLATE = String.format("{\n" +
+    protected static final String TEMPLATE_SEND_FILE = "{\n" +
             "   \"touser\" : \"%s\",\n" +
             "   \"msgtype\" : \"file\",\n" +
             "   \"agentid\" : %s,\n" +
@@ -43,9 +46,9 @@ public class WeixinMessageTemplate {
             "       \"media_id\" : \"%s\"\n" +
             "   },\n" +
             "   \"safe\":0\n" +
-            "}");
+            "}";
 
-    protected static final String SEND_VIDEO_TEMPLATE = String.format("{\n" +
+    protected static final String TEMPLATE_SEND_VIDEO = "{\n" +
             "   \"touser\" : \"%s\",\n" +
             "   \"msgtype\" : \"video\",\n" +
             "   \"agentid\" : %s,\n" +
@@ -55,9 +58,9 @@ public class WeixinMessageTemplate {
             "       \"description\" : \"%s\"\n" +
             "   },\n" +
             "   \"safe\":0\n" +
-            "}");
+            "}";
 
-    protected static final String SEND_TEXTCARD_TEMPLATE = "{\n" +
+    protected static final String TEMPLATE_SEND_TEXTCARD = "{\n" +
             "   \"touser\" : \"%s\",\n" +
             "   \"msgtype\" : \"textcard\",\n" +
             "   \"agentid\" : %s,\n" +
@@ -69,7 +72,20 @@ public class WeixinMessageTemplate {
             "   \"safe\":0\n" +
             "}";
 
-    protected static final String TITLE = "构建结果";
-
-    protected static final String DESCRIPTION = "项目名称: %s\n构建开始时间: %s\n构建持续时间: %s\n构建结果: %s";
+    protected static final String TEMPLATE_SEND_NEWS = "{\n" +
+            "   \"touser\" : \"%s\",\n" +
+            "   \"msgtype\" : \"news\",\n" +
+            "   \"agentid\" : %s,\n" +
+            "   \"news\" : {\n" +
+            "       \"articles\" : [" +
+            "           {" +
+            "             \"title\" : \"%s\",\n" +
+            "             \"description\" : \"%s\",\n" +
+            "             \"url\" : \"%s\"\n" +
+            "             \"picurl\" : \"%s\"\n" +
+            "           },\n" +
+            "         ]" +
+            "     }" +
+            "   \"safe\":0\n" +
+            "}";
 }

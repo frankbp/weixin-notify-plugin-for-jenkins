@@ -1,4 +1,4 @@
-package jenkins.plugin.weixinnotify;
+package jenkins.plugin.weixinnotification;
 
 /**
  * Created by jianjing on 2017/7/11.
@@ -15,4 +15,6 @@ public interface WeixinService {
         void sendFile(String fileId);
 
         void sendTextcard();
+
+        void sendNews();
 }
