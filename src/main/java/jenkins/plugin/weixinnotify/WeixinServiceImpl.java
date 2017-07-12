@@ -91,7 +91,7 @@ public class WeixinServiceImpl implements WeixinService {
                 this.agentId,
                 WeixinMessageTemplate.TITLE,
                 "项目名称: " + this.build.getProject().getDisplayName() +
-                        "\n构建开始时间: " + this.build.getTimestampString() +
+                        "\n构建开始时间: " + this.build.getTimestamp().getTime().toString() +
                         "\n构建持续时间: " + this.build.getDurationString() +
                         "\n构建结果: " + this.build.getResult().toString(),
                 this.build.getProject().getAbsoluteUrl() + this.build.getId());

@@ -31,12 +31,6 @@ public class WeixinNotify extends Notifier {
 	private String message;
 
 	@DataBoundConstructor
-	public WeixinNotify(String message) {
-		super();
-		this.message = message;
-
-	}
-
 	public WeixinNotify() {
 		super();
 	}
@@ -48,7 +42,6 @@ public class WeixinNotify extends Notifier {
 
 	@Override
 	public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-		listener.getLogger().println("perform");
 		new WeixinServiceImpl(listener, build).sendTextcard();
 		return true;
 	}
