@@ -2,14 +2,15 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:section title="微信通知">
 	  <f:entry title="企业CorpID" field="corpId">
-      	    <f:textbox />
-      	  </f:entry>
+      	  <f:textbox />
+      </f:entry>
+      <f:entry title="企业CorpSecret" field="corpSecret">
+          <f:password />
+      </f:entry>
 	  <f:entry title="应用ID" field="agentId">
 	    <f:textbox />
 	  </f:entry>
-	  <f:entry title="应用SecretKey" field="secretKey">
-	    <f:textbox />
-	  </f:entry>
+
 	  <f:advanced>
 	  	<f:entry title="微信消息模板" field="template">
 	    	<f:textbox />

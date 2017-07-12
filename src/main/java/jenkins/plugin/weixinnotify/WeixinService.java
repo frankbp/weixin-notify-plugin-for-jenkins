@@ -4,9 +4,15 @@ package jenkins.plugin.weixinnotify;
  * Created by jianjing on 2017/7/11.
  */
 public interface WeixinService {
-        void start();
+        void sendText(String text);
 
-        void success();
+        void sendImage(String imageId);
 
-        void failed();
+        void sendVoice(String voiceId);
+
+        void sendVideo(String videoId);
+
+        void sendFile(String fileId);
+
+        void sendTextcard();
 }
