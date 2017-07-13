@@ -85,7 +85,8 @@ public class WeixinApi {
             "             \"title\" : \"%s\",\n" +
             "             \"description\" : \"%s\",\n" +
             "             \"url\" : \"%s\",\n" +
-            "             \"picurl\" : \"%s\"\n" +
+            "             \"picurl\" : \"%s\",\n" +
+            "             \"btntxt\" : \"查看详情\",\n" +
             "           },\n" +
             "         ]" +
             "     }" +
