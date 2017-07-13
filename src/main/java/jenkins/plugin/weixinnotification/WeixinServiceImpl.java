@@ -67,7 +67,7 @@ public class WeixinServiceImpl implements WeixinService {
 
     public void sendContent(String content) {
         this.logger.println("sendContent");
-        if (!sendMessageWithToken(content)) {
+        if (token == null || !sendMessageWithToken(content)) {
             requestForToken();
             sendMessageWithToken(content);
         }
@@ -135,8 +135,7 @@ public class WeixinServiceImpl implements WeixinService {
         String content = String.format(WeixinApi.TEMPLATE_SEND_NEWS,
                 toUser,
                 this.agentId,
-                String.format(WeixinMessageTemplate.TITLE,
-                        getBuildResult()),
+                String.format(WeixinMessageTemplate.TITLE, getBuildResult()),
                 generateDescription(),
                 generateUrl(),
                 generateIcon());
@@ -186,28 +185,25 @@ public class WeixinServiceImpl implements WeixinService {
         return "";
     }
 
-    private String getJenkinUrl() {
-        return Jenkins.getInstance().getRootUrl();
+    private String getJenkinsIconUrl() {
+
+        return Jenkins.getInstance().getRootUrl() + "static/e59dfe28/images/48x48/";
     }
 
     private String getSuccessIcon() {
-        return "http://www.iconsdb.com/icons/download/green/circle-48.png";
-        //return getJenkinUrl() + "static/e59dfe28/images/48x48/blue.png";
+        return getJenkinsIconUrl() + "blue.png";
     }
 
     private String getFailIcon() {
-        return "http://www.iconsdb.com/icons/download/red/circle-48.png";
-        //return getJenkinUrl() + "static/e59dfe28/images/48x48/red.png";
+        return getJenkinsIconUrl() + "red.png";
     }
 
     private String getUnstableIcon() {
-        return "http://www.iconsdb.com/icons/download/yellow/circle-48.png";
-        //return getJenkinUrl() + "static/e59dfe28/images/48x48/yellow.png";
+        return getJenkinsIconUrl() + "yellow.png";
     }
 
     private String getUnknownIcon() {
-        return "http://www.iconsdb.com/icons/download/icon-sets/gray-leather/circle-48.png";
-        //return getJenkinUrl() + "static/e59dfe28/images/48x48/grey.png";
+        return getJenkinsIconUrl() + "grey.png";
     }
 
     private String generateIcon() {
@@ -272,7 +268,8 @@ public class WeixinServiceImpl implements WeixinService {
                     if (!errcode.equals("0")) {
                         String errmsg = responseMap.get("errmsg").toString();
                         logger.println(errmsg);
-                        if (errmsg.equals("invalid access_token")) {
+                        if (errmsg.equals(WeixinApi.ERROR_MESSAGE_INVALID_TOKEN) ||
+                                errmsg.equals(WeixinApi.ERROR_MESSAGE_EXPIRED_TOKEN)) {
                             return false;
                         }
                         logger.println(String.format("发送消息失败, errcode=%s, errmsg=%s", errcode, errmsg));

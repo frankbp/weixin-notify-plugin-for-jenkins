@@ -8,6 +8,9 @@ public class WeixinApi {
 
     protected static final String URL_ACCESS_TOKEN = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s";
 
+    protected static final String ERROR_MESSAGE_INVALID_TOKEN = "invalid access_token";
+    protected static final String ERROR_MESSAGE_EXPIRED_TOKEN = "access_token expired";
+
     protected static final String TEMPLATE_SEND_TEXT = "{\n" +
             "   \"touser\" : \"%s\",\n" +
             "   \"msgtype\" : \"text\",\n" +
@@ -81,7 +84,7 @@ public class WeixinApi {
             "           {" +
             "             \"title\" : \"%s\",\n" +
             "             \"description\" : \"%s\",\n" +
-            "             \"url\" : \"%s\"\n" +
+            "             \"url\" : \"%s\",\n" +
             "             \"picurl\" : \"%s\"\n" +
             "           },\n" +
             "         ]" +
