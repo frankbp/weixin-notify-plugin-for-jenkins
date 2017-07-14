@@ -8,11 +8,8 @@ import java.util.Map;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
+import hudson.model.*;
 
-import hudson.model.Run;
-import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpPost;
@@ -34,6 +31,7 @@ public class WeixinServiceImpl implements WeixinService {
     private String corpSecret;
     private String agentId;
     private String toUser;
+    private String buildStatus = "";
 
     private Run run;
 
@@ -49,24 +47,26 @@ public class WeixinServiceImpl implements WeixinService {
         agentId = new WeixinNotification().getDescriptor().getAgentId();
 
         BUILD_RESULT_MAP.put("SUCCESS", "成功");
-        BUILD_RESULT_MAP.put("FAIL", "失败");
+        BUILD_RESULT_MAP.put("FAILURE", "失败");
         BUILD_RESULT_MAP.put("UNSTABLE", "不稳定");
     }
 
-    public WeixinServiceImpl(BuildListener listener, AbstractBuild build, String toUser) {
+    public WeixinServiceImpl(BuildListener listener, AbstractBuild build,
+                             String toUser) {
         this.logger = listener.getLogger();
         this.build = build;
         this.toUser = toUser;
     }
 
-    public WeixinServiceImpl(TaskListener listener, Run run, String toUser) {
+    public WeixinServiceImpl(TaskListener listener, Run run,
+                             String toUser, String buildStatus) {
         this.logger = listener.getLogger();
         this.run = run;
         this.toUser = toUser;
+        this.buildStatus = buildStatus;
     }
 
     public void sendContent(String content) {
-        this.logger.println("sendContent");
         if (token == null || !sendMessageWithToken(content)) {
             requestForToken();
             sendMessageWithToken(content);
@@ -133,12 +133,12 @@ public class WeixinServiceImpl implements WeixinService {
     @Override
     public void sendNews() {
         String content = String.format(WeixinApi.TEMPLATE_SEND_NEWS,
-                toUser,
-                this.agentId,
-                String.format(WeixinMessageTemplate.TITLE, getBuildResult()),
-                generateDescription(),
-                generateUrl(),
-                generateIcon());
+                    toUser,
+                    this.agentId,
+                    String.format(WeixinMessageTemplate.TITLE, getBuildResult()),
+                    generateDescription(),
+                    generateUrl(),
+                    generateIcon());
         sendContent(content);
     }
 
@@ -147,6 +147,7 @@ public class WeixinServiceImpl implements WeixinService {
         if (this.build != null) {
             return String.format(WeixinMessageTemplate.DESCRIPTION,
                     this.build.getProject().getDisplayName(),
+                    this.build.getId(),
                     this.build.getTimestamp().getTime().toString(),
                     this.build.getDurationString(),
                     getBuildResult());
@@ -154,6 +155,7 @@ public class WeixinServiceImpl implements WeixinService {
         if (this.run != null) {
             return String.format(WeixinMessageTemplate.DESCRIPTION,
                     this.run.getParent().getDisplayName(),
+                    this.run.getId(),
                     this.run.getTimestamp().getTime().toString(),
                     this.run.getDurationString(),
                     getBuildResult());
@@ -166,11 +168,20 @@ public class WeixinServiceImpl implements WeixinService {
 
         if (this.build != null) {
             buildResult = this.build.getResult().toString();
-
+        } else {
+            if (!this.buildStatus.equals("")) {
+                buildResult = buildStatus;
+            }
+//            if (this.run != null) {
+//                if (this.run.getResult() != null) {
+//                    buildResult = this.run.getResult().toString();
+//                    this.logger.println((String.format("构建结果: %s", buildResult)));
+//                } else {
+//                    this.logger.println("构建结果: null");
+//                }
+//            }
         }
-        if (this.run != null) {
-            buildResult = this.run.getResult().toString();
-        }
+        this.logger.println((String.format("构建结果: %s", buildResult)));
 
         return BUILD_RESULT_MAP.getOrDefault(buildResult, "未知");
     }

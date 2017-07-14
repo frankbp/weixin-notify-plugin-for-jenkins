@@ -10,6 +10,7 @@ import hudson.tasks.*;
 
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -23,11 +24,13 @@ import java.io.IOException;
 public class WeixinNotification extends Notifier implements SimpleBuildStep {
 
 	public String toUser;
+	public String buildStatus;
 
 	@DataBoundConstructor
-	public WeixinNotification(String toUser) {
+	public WeixinNotification(String toUser, String buildStatus) {
 		super();
 		this.toUser = toUser;
+		this.buildStatus = buildStatus;
 	}
 
 	public WeixinNotification() {
@@ -57,7 +60,7 @@ public class WeixinNotification extends Notifier implements SimpleBuildStep {
 	@Override
 	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath filePath, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
 		taskListener.getLogger().println(toUser);
-	    new WeixinServiceImpl(taskListener, run, toUser).sendNews();
+	    new WeixinServiceImpl(taskListener, run, toUser, buildStatus).sendNews();
 	}
 
 	@Extension
@@ -78,7 +81,7 @@ public class WeixinNotification extends Notifier implements SimpleBuildStep {
 
 		@Override
 		public String getDisplayName() {
-			return "微信通知";
+			return "weixinNotification";
 		}
 
 		@Override
