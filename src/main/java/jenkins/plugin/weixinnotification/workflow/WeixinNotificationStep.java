@@ -25,26 +25,26 @@ import java.util.ArrayList;
  * Created by jianjing on 2017/7/14.
  */
 public class WeixinNotificationStep extends AbstractStepImpl {
-    public @Nonnull String toUser;
-    public String buildStatus;
+    public String to;
+    public String status;
 
     @DataBoundConstructor
-    public WeixinNotificationStep(@Nonnull String toUser,
-                                  String buildStatus) {
-        this.toUser = toUser;
-        this.buildStatus = buildStatus;
+    public WeixinNotificationStep(String to,
+                                  String status) {
+        super();
+        this.to = to;
+        this.status = status;
     }
 
 
-    @Nonnull
-    public String getToUser() {
+    public String getTo() {
 
-        return parseUsers(toUser);
+        return parseUsers(to);
     }
 
 
-    public String getBuildStatus() {
-        return buildStatus;
+    public String getStatus() {
+        return status;
     }
 
     private String parseUsers(String toUser) {
@@ -62,13 +62,13 @@ public class WeixinNotificationStep extends AbstractStepImpl {
 
 
     @DataBoundSetter
-    public void setToUser(String toUser) {
-        this.toUser = toUser;
+    public void setTo(String to) {
+        this.to = to;
     }
 
     @DataBoundSetter
-    public void setBuildStatus(String buildStatus) {
-        this.buildStatus = buildStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Extension
@@ -101,17 +101,17 @@ public class WeixinNotificationStep extends AbstractStepImpl {
         transient Run<?, ?> run;
 
         private String corpId;
-        private String corpSecret;
+        private String agentSecret;
         private String agentId;
 
         @Override
         protected Void run() throws Exception {
             WeixinNotification.WeixinNotifierDescriptor weixinDesc = Jenkins.getInstance().getDescriptorByType(WeixinNotification.WeixinNotifierDescriptor.class);
             this.corpId = weixinDesc.getCorpId();
-            this.corpSecret = weixinDesc.getCorpSecret();
+            this.agentSecret = weixinDesc.getAgentSecret();
             this.agentId = weixinDesc.getAgentId();
 
-            new WeixinServiceImpl(listener, run, step.getToUser(), step.getBuildStatus()).sendNews();
+            new WeixinServiceImpl(listener, run, step.getTo(), step.getStatus()).sendNews();
 
             return null;
         }
