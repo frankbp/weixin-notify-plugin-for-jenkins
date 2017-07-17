@@ -18,7 +18,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-
+import java.util.ArrayList;
 
 
 /**
@@ -28,9 +28,9 @@ public class WeixinNotificationStep extends AbstractStepImpl {
     public @Nonnull String toUser;
     public String buildStatus;
 
-
     @DataBoundConstructor
-    public WeixinNotificationStep(@Nonnull String toUser, String buildStatus) {
+    public WeixinNotificationStep(@Nonnull String toUser,
+                                  String buildStatus) {
         this.toUser = toUser;
         this.buildStatus = buildStatus;
     }
@@ -38,12 +38,28 @@ public class WeixinNotificationStep extends AbstractStepImpl {
 
     @Nonnull
     public String getToUser() {
-        return toUser;
+
+        return parseUsers(toUser);
     }
+
 
     public String getBuildStatus() {
         return buildStatus;
     }
+
+    private String parseUsers(String toUser) {
+        StringBuilder toUsers = new StringBuilder("");
+
+        for(String user : toUser.split(",")) {
+            if (user.contains("@")) {
+                toUsers.append(user.split("@")[0]);
+                toUsers.append('|');
+            }
+        }
+
+        return toUsers.toString();
+    }
+
 
     @DataBoundSetter
     public void setToUser(String toUser) {
