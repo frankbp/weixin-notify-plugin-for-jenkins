@@ -4,17 +4,11 @@
 	  <f:entry title="企业CorpID" field="corpId">
       	  <f:textbox />
       </f:entry>
-      <f:entry title="企业CorpSecret" field="corpSecret">
+      <f:entry title="应用Secret" field="agentSecret">
           <f:password />
       </f:entry>
 	  <f:entry title="应用ID" field="agentId">
 	    <f:textbox />
 	  </f:entry>
-
-	  <f:advanced>
-	  	<f:entry title="微信消息模板" field="template">
-	    	<f:textbox />
-	  	</f:entry>
-	  </f:advanced>
   </f:section>
 </j:jelly>

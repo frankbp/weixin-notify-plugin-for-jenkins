@@ -28,7 +28,7 @@ public class WeixinServiceImpl implements WeixinService {
 
     private AbstractBuild build;
     private String corpId;
-    private String corpSecret;
+    private String agentSecret;
     private String agentId;
     private String toUser;
     private String buildStatus = "";
@@ -43,7 +43,7 @@ public class WeixinServiceImpl implements WeixinService {
 
     {
         corpId = new WeixinNotification().getDescriptor().getCorpId();
-        corpSecret = new WeixinNotification().getDescriptor().getCorpSecret();
+        agentSecret = new WeixinNotification().getDescriptor().getAgentSecret();
         agentId = new WeixinNotification().getDescriptor().getAgentId();
 
         BUILD_RESULT_MAP.put("SUCCESS", "成功");
@@ -231,7 +231,7 @@ public class WeixinServiceImpl implements WeixinService {
     }
 
     private String requestForToken() {
-        String url = String.format(WeixinApi.URL_ACCESS_TOKEN, this.corpId, this.corpSecret);
+        String url = String.format(WeixinApi.URL_ACCESS_TOKEN, this.corpId, this.agentSecret);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);

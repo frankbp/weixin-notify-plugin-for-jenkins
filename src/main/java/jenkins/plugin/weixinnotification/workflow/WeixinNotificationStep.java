@@ -101,14 +101,14 @@ public class WeixinNotificationStep extends AbstractStepImpl {
         transient Run<?, ?> run;
 
         private String corpId;
-        private String corpSecret;
+        private String agentSecret;
         private String agentId;
 
         @Override
         protected Void run() throws Exception {
             WeixinNotification.WeixinNotifierDescriptor weixinDesc = Jenkins.getInstance().getDescriptorByType(WeixinNotification.WeixinNotifierDescriptor.class);
             this.corpId = weixinDesc.getCorpId();
-            this.corpSecret = weixinDesc.getCorpSecret();
+            this.agentSecret = weixinDesc.getAgentSecret();
             this.agentId = weixinDesc.getAgentId();
 
             new WeixinServiceImpl(listener, run, step.getToUser(), step.getBuildStatus()).sendNews();

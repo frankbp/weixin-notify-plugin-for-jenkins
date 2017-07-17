@@ -67,7 +67,7 @@ public class WeixinNotification extends Notifier implements SimpleBuildStep {
 	public static class WeixinNotifierDescriptor extends BuildStepDescriptor<Publisher> {
 
 		private String corpId;
-		private String corpSecret;
+		private String agentSecret;
 		private String agentId;
 
 		@Override
@@ -81,13 +81,13 @@ public class WeixinNotification extends Notifier implements SimpleBuildStep {
 
 		@Override
 		public String getDisplayName() {
-			return "weixinNotification";
+			return "Wechat Notification";
 		}
 
 		@Override
 		public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
 			corpId = formData.getString("corpId");
-			corpSecret = formData.getString("corpSecret");
+			agentSecret = formData.getString("agentSecret");
 			agentId = formData.getString("agentId");
 			save();
 			return super.configure(req, formData);
@@ -97,8 +97,8 @@ public class WeixinNotification extends Notifier implements SimpleBuildStep {
 			return corpId;
 		}
 
-		public String getCorpSecret() {
-			return corpSecret;
+		public String getAgentSecret() {
+			return agentSecret;
 		}
 
 		public String getAgentId() {
