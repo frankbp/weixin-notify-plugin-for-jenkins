@@ -40,7 +40,6 @@ public class WeixinNotificationStep extends AbstractStepImpl {
 
     @Nonnull
     public String getTo() {
-
         return parseUsers(to);
     }
 
@@ -55,7 +54,7 @@ public class WeixinNotificationStep extends AbstractStepImpl {
 
     @DataBoundSetter
     public void setStatus(@CheckForNull String status) {
-        this.to = Util.fixNull(status);
+        this.status = Util.fixNull(status);
     }
 
 
