@@ -33,8 +33,7 @@ public class WeixinNotificationStep extends AbstractStepImpl {
     public String status;
 
     @DataBoundConstructor
-    public WeixinNotificationStep(String to,
-                                  String status) {
+    public WeixinNotificationStep(String to) {
         super();
         this.to = to;
     }
@@ -42,7 +41,6 @@ public class WeixinNotificationStep extends AbstractStepImpl {
 
     @Nonnull
     public String getTo() {
-
         return parseUsers(to);
     }
 
@@ -52,7 +50,7 @@ public class WeixinNotificationStep extends AbstractStepImpl {
 
     @DataBoundSetter
     public void setStatus(@CheckForNull String status) {
-        this.to = Util.fixNull(status);
+        this.status = Util.fixNull(status);
     }
 
 
@@ -69,16 +67,6 @@ public class WeixinNotificationStep extends AbstractStepImpl {
         return toUsers.toString();
     }
 
-
-//    @DataBoundSetter
-//    public void setToUser(String toUser) {
-//        this.to = toUser;
-//    }
-//
-//    @DataBoundSetter
-//    public void setBuildStatus(String buildStatus) {
-//        this.status = buildStatus;
-//    }
 
     @Extension
     public static class DescriptorImpl extends AbstractStepDescriptorImpl {
