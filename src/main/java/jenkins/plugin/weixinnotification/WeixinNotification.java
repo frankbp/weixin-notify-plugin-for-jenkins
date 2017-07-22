@@ -21,7 +21,7 @@ import java.io.IOException;
 /**
  * Created by jianjing on 2017/7/11.
  */
-public class WeixinNotification extends Notifier implements SimpleBuildStep {
+public class WeixinNotification extends Notifier {
 
 	public String toUser;
 	public String buildStatus;
@@ -57,11 +57,11 @@ public class WeixinNotification extends Notifier implements SimpleBuildStep {
 	}
 
 	// Build from pipeline
-	@Override
+	/*@Override
 	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath filePath, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
 		taskListener.getLogger().println(toUser);
 	    new WeixinServiceImpl(taskListener, run, toUser, buildStatus).sendNews();
-	}
+	}*/
 
 	@Extension
 	public static class WeixinNotifierDescriptor extends BuildStepDescriptor<Publisher> {
