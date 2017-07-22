@@ -2,6 +2,7 @@ package jenkins.plugin.weixinnotification.workflow;
 
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
@@ -16,6 +17,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -26,26 +28,36 @@ import java.util.ArrayList;
  */
 public class WeixinNotificationStep extends AbstractStepImpl {
     public String to;
+
+    @CheckForNull
     public String status;
 
     @DataBoundConstructor
-    public WeixinNotificationStep(String to,
-                                  String status) {
+    public WeixinNotificationStep(String to) {
         super();
         this.to = to;
-        this.status = status;
     }
 
-
+    @Nonnull
     public String getTo() {
 
         return parseUsers(to);
     }
 
-
-    public String getStatus() {
-        return status;
+    @DataBoundSetter
+    public void setTo(String to) {
+        this.to = to;
     }
+
+    public @CheckForNull String getStatus() {
+        return status == null ? "" : status;
+    }
+
+    @DataBoundSetter
+    public void setStatus(@CheckForNull String status) {
+        this.to = Util.fixNull(status);
+    }
+
 
     private String parseUsers(String toUser) {
         StringBuilder toUsers = new StringBuilder("");
@@ -60,16 +72,6 @@ public class WeixinNotificationStep extends AbstractStepImpl {
         return toUsers.toString();
     }
 
-
-    @DataBoundSetter
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    @DataBoundSetter
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     @Extension
     public static class DescriptorImpl extends AbstractStepDescriptorImpl {
