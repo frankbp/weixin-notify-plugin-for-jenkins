@@ -169,17 +169,15 @@ public class WeixinServiceImpl implements WeixinService {
         if (this.build != null) {
             buildResult = this.build.getResult().toString();
         } else {
-            if (!this.buildStatus.equals("")) {
-                buildResult = buildStatus;
+            if (this.run != null) {
+                if (this.run.getResult() != null) {
+                    buildResult = this.run.getResult().toString();
+                }
+            } else {
+                if (!this.buildStatus.equals("")) {
+                    buildResult = buildStatus;
+                }
             }
-//            if (this.run != null) {
-//                if (this.run.getResult() != null) {
-//                    buildResult = this.run.getResult().toString();
-//                    this.logger.println((String.format("构建结果: %s", buildResult)));
-//                } else {
-//                    this.logger.println("构建结果: null");
-//                }
-//            }
         }
         this.logger.println((String.format("构建结果: %s", buildResult)));
 
