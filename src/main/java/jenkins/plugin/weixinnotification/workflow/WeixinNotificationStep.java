@@ -20,7 +20,6 @@ import org.kohsuke.stapler.DataBoundSetter;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import java.util.ArrayList;
 
 
 /**
@@ -82,7 +81,7 @@ public class WeixinNotificationStep extends AbstractStepImpl {
 
         @Override
         public String getDisplayName() {
-            return "Send Weixin notification";
+            return "Send Wechat Notification";
         }
     }
 

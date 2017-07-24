@@ -189,7 +189,7 @@ public class WeixinServiceImpl implements WeixinService {
             return this.build.getProject().getAbsoluteUrl() + this.build.getId();
         }
         if (this.run != null) {
-            return this.run.getAbsoluteUrl() + this.run.getId();
+            return this.run.getParent().getAbsoluteUrl() + this.run.getId();
         }
         return "";
     }
