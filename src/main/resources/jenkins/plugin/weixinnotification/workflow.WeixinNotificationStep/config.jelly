@@ -7,4 +7,7 @@
     <f:entry title="构建状态:" field="status">
         <f:textbox/>
     </f:entry>
+    <f:entry title="链接地址:" field="url">
+        <f:textbox/>
+    </f:entry>
 </j:jelly>

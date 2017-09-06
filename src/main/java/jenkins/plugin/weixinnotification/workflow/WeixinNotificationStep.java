@@ -31,6 +31,9 @@ public class WeixinNotificationStep extends AbstractStepImpl {
     @CheckForNull
     public String status;
 
+    @CheckForNull
+    public String url;
+
     @DataBoundConstructor
     public WeixinNotificationStep(String to) {
         super();
@@ -47,9 +50,18 @@ public class WeixinNotificationStep extends AbstractStepImpl {
         return status == null ? "" : status;
     }
 
+    public @CheckForNull String getUrl() {
+        return url == null ? "" : url;
+    }
+
     @DataBoundSetter
     public void setStatus(@CheckForNull String status) {
         this.status = Util.fixNull(status);
+    }
+
+    @DataBoundSetter
+    public void setUrl(@CheckForNull String url) {
+        this.url = Util.fixNull(url);
     }
 
 
@@ -58,9 +70,11 @@ public class WeixinNotificationStep extends AbstractStepImpl {
 
         for(String user : toUser.split(",")) {
             if (user.contains("@")) {
-                toUsers.append(user.split("@")[0]);
-                toUsers.append('|');
+                toUsers.append(user.split("@")[0].trim());
+            } else {
+                toUsers.append(user.trim());
             }
+            toUsers.append('|');
         }
 
         return toUsers.toString();
@@ -107,7 +121,7 @@ public class WeixinNotificationStep extends AbstractStepImpl {
             this.agentSecret = weixinDesc.getAgentSecret();
             this.agentId = weixinDesc.getAgentId();
 
-            new WeixinServiceImpl(listener, run, step.getTo(), step.getStatus()).sendNews();
+            new WeixinServiceImpl(listener, run, step.getTo(), step.getStatus(), step.getUrl()).sendNews();
 
             return null;
         }
