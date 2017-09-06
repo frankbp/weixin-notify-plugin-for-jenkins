@@ -4,5 +4,5 @@
 -->
 <?jelly escape-by-default='true'?>
 <div>
-	微信通知
+	Wechat Notification
 </div>

@@ -32,6 +32,7 @@ public class WeixinServiceImpl implements WeixinService {
     private String agentId;
     private String toUser;
     private String buildStatus = "";
+    private String url = "";
 
     private Run run;
 
@@ -58,12 +59,21 @@ public class WeixinServiceImpl implements WeixinService {
         this.toUser = toUser;
     }
 
+//    public WeixinServiceImpl(TaskListener listener, Run run,
+//                             String toUser, String buildStatus) {
+//        this.logger = listener.getLogger();
+//        this.run = run;
+//        this.toUser = toUser;
+//        this.buildStatus = buildStatus;
+//    }
+
     public WeixinServiceImpl(TaskListener listener, Run run,
-                             String toUser, String buildStatus) {
+                             String toUser, String buildStatus, String url) {
         this.logger = listener.getLogger();
         this.run = run;
         this.toUser = toUser;
         this.buildStatus = buildStatus;
+        this.url = url;
     }
 
     public void sendContent(String content) {
@@ -137,7 +147,7 @@ public class WeixinServiceImpl implements WeixinService {
                     this.agentId,
                     String.format(WeixinMessageTemplate.TITLE, getBuildResult()),
                     generateDescription(),
-                    generateUrl(),
+                    url.equals("")? generateUrl() : url,
                     generateIcon());
         sendContent(content);
     }
@@ -189,7 +199,7 @@ public class WeixinServiceImpl implements WeixinService {
             return this.build.getProject().getAbsoluteUrl() + this.build.getId();
         }
         if (this.run != null) {
-            return this.run.getAbsoluteUrl() + this.run.getId();
+            return this.run.getParent().getAbsoluteUrl();
         }
         return "";
     }
