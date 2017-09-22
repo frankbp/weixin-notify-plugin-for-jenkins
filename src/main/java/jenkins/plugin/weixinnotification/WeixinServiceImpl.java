@@ -272,36 +272,30 @@ public class WeixinServiceImpl implements WeixinService {
         HttpPost httppost = new HttpPost(String.format(WeixinApi.URL_SEND_MESSAGE, token));
 
         try {
-                StringEntity params = new StringEntity(content, "UTF-8");
+            StringEntity params = new StringEntity(content, "UTF-8");
             logger.println(content);
-                httppost.setEntity(params);
-                httppost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-                CloseableHttpResponse response = httpClient.execute(httppost);
-                try {
-                    HttpEntity entity = response.getEntity();
-                    String responseString = EntityUtils.toString(entity);
-                    Map<String, String> responseMap = JSON.parseObject(responseString, new TypeReference<Map<String, String>>() {});
-                    logger.println(responseMap);
-                    String errcode = responseMap.get("errcode").toString();
-                    logger.println(errcode);
-                    if (!errcode.equals("0")) {
-                        String errmsg = responseMap.get("errmsg").toString();
-                        logger.println(errmsg);
-                        if (errmsg.equals(WeixinApi.ERROR_MESSAGE_INVALID_TOKEN) ||
-                                errmsg.equals(WeixinApi.ERROR_MESSAGE_EXPIRED_TOKEN)) {
-                            return false;
-                        }
-                        logger.println(String.format("发送消息失败, errcode=%s, errmsg=%s", errcode, errmsg));
-                    }
-
-                } catch (IOException e) {
-                    logger.println(String.format("发送消息失败, exception=%s", e.toString()));
-                } finally {
-                    response.close();
+            httppost.setEntity(params);
+            httppost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            CloseableHttpResponse response = httpClient.execute(httppost);
+            try {
+                HttpEntity entity = response.getEntity();
+                String responseString = EntityUtils.toString(entity);
+                Map<String, String> responseMap = JSON.parseObject(responseString, new TypeReference<Map<String, String>>() {});
+                logger.println(responseMap);
+                String errcode = responseMap.get("errcode").toString();
+                String errmsg = responseMap.get("errmsg").toString();
+                if (errcode.equals(WeixinApi.ERROR_CODE_INVALID_TOKEN)) {
+                    logger.println(String.format("token失效, errcode=%s, errmsg=%s", errcode, errmsg));
+                    return false;
                 }
             } catch (IOException e) {
                 logger.println(String.format("发送消息失败, exception=%s", e.toString()));
             } finally {
+                response.close();
+            }
+        } catch (IOException e) {
+            logger.println(String.format("发送消息失败, exception=%s", e.toString()));
+        } finally {
             try {
                 httpClient.close();
             } catch (IOException e) {
